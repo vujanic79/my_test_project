@@ -1,0 +1,4 @@
+# Don't merge docker files
+
+server/Dockerfile merge=ours
+server/docker-compose.yaml merge=ours

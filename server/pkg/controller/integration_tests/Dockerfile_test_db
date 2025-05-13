@@ -1,0 +1,5 @@
+FROM postgres:bookworm
+
+COPY ./seed/db_tables.sql /docker-entrypoint-initdb.d/001_db_tables.sql
+COPY ./seed/db_data.sql /docker-entrypoint-initdb.d/002_db_data.sql
+
