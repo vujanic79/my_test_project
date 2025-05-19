@@ -34,7 +34,6 @@ pipeline {
         stage('Test Application') {
             steps {
                 sh 'chmod +x server/001_test_application.sh && server/001_test_application.sh'
-                sh 'go version'
                 junit 'server/report.xml'
             }
         }
