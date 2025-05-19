@@ -8,7 +8,7 @@ WORKDIR /app
 COPY server/go.mod server/go.sum ./
 RUN go mod download
 
-COPY . .
+COPY ./server .
 
 # ------------------------------
 # Development image
