@@ -11,8 +11,8 @@ pipeline {
                     echo "Job Name: $jobName"
                     echo "Build Number: $buildNumber"
 
-                    sh 'sudo docker --version'
-                    sh 'sudo go version'
+                    sh 'docker --version'
+                    sh 'go version'
                 }
             }
         }
