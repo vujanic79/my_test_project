@@ -1,5 +1,5 @@
 #!/bin/bash
-docker image build -t milan79/udemy-jenkins-tutorial-2:$1 -f server/Dockerfile .
+docker image build -t milan79/udemy-jenkins-tutorial-2:$1 -f server/Dockerfile . --env-file server/.env
 
 if [ -z ${DOCKER_HUB_USER+x} ]
 then
