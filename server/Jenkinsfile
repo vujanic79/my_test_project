@@ -12,7 +12,6 @@ pipeline {
                     echo "Build Number: $buildNumber"
 
                     sh 'docker --version'
-                    sh 'go version'
                 }
             }
         }
@@ -35,6 +34,7 @@ pipeline {
         stage('Test Application') {
             steps {
                 sh 'chmod +x ./001_test_application.sh && ./001_test_application.sh'
+                sh 'go version'
                 junit 'server/report.xml'
             }
         }
