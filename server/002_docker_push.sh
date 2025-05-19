@@ -1,5 +1,5 @@
 #!/bin/bash
-docker image build -t milan79/udemy-jenkins-tutorial-2:$1 -f .
+docker image build -t milan79/udemy-jenkins-tutorial-2:$1 -f ./Dockerfile .
 
 if [ -z ${DOCKER_HUB_USER+x} ]
 then
