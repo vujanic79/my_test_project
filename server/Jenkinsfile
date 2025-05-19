@@ -1,0 +1,55 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Verify Shell Environment') {
+            script {
+                def jobName = env.JOB_NAME
+                def buildNumber = env.BUILD_NUMBER
+
+                echo "Job Name: $jobName"
+                echo "Build Number: $buildNumber"
+
+                sh 'sudo docker --version'
+                sh 'sudo go version'
+            }
+        }
+
+        stage('Checkout my_test_project Git Repository') {
+            steps {
+                script {
+                    // Clone the Git repository's master branch
+                    def gitRepoUrl = 'https://github.com/vujanic79/my_test_project.git'
+
+                    checkout([$class: 'GitSCM',
+                        branches: [[name: '*/main']],
+                        userRemoteConfigs: [[url: gitRepoUrl]],
+                        extensions: [[$class: 'CleanBeforeCheckout'], [$class: 'CloneOption', noTags: false, shallow: true, depth: 1]]
+                    ])
+                }
+            }
+        }
+
+        stage('Test Application') {
+            steps {
+                sh 'chmod +x ./001_test_application.sh && ./001_test_application.sh'
+                junit testResultsFile:"server/report.xml"
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    // Get the job name and build number
+                    def jobName = env.JOB_NAME
+                    def buildNumber = env.BUILD_NUMBER
+
+                withCredentials([usernamePassword(credentialsId: '844bc746-c1af-475a-8a83-bfacc603449f', usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                    sh "chmod +x ./002_docker_push.sh"
+                    sh "./0002_docker_push.sh $buildNumber"
+                }
+                echo "Build Completed - Job Name: $jobName  --  Build Number: $buildNumber"
+            }
+        }
+    }
+}
