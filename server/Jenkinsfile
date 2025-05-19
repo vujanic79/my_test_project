@@ -46,8 +46,8 @@ pipeline {
                     def buildNumber = env.BUILD_NUMBER
 
                 withCredentials([usernamePassword(credentialsId: '844bc746-c1af-475a-8a83-bfacc603449f', usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
-                    sh "chmod +x ./002_docker_push.sh"
-                    sh "./0002_docker_push.sh $buildNumber"
+                    sh "chmod +x server/002_docker_push.sh"
+                    sh "server/002_docker_push.sh $buildNumber"
                 }
                 echo "Build Completed - Job Name: $jobName  --  Build Number: $buildNumber"
             }
