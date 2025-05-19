@@ -3,15 +3,17 @@ pipeline {
 
     stages {
         stage('Verify Shell Environment') {
-            script {
-                def jobName = env.JOB_NAME
-                def buildNumber = env.BUILD_NUMBER
+            steps {
+                script {
+                    def jobName = env.JOB_NAME
+                    def buildNumber = env.BUILD_NUMBER
 
-                echo "Job Name: $jobName"
-                echo "Build Number: $buildNumber"
+                    echo "Job Name: $jobName"
+                    echo "Build Number: $buildNumber"
 
-                sh 'sudo docker --version'
-                sh 'sudo go version'
+                    sh 'sudo docker --version'
+                    sh 'sudo go version'
+                }
             }
         }
 
