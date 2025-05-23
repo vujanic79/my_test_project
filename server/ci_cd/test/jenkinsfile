@@ -1,0 +1,54 @@
+pipeline {
+    agent any
+
+    environment {
+        DEPLOY_JOB='golang-react-todo-app-deploy'
+    }
+
+    stages {
+        stage('Verify Shell Environment') {
+            steps {
+                script {
+                    def jobName = env.JOB_NAME
+                    def buildNumber = env.BUILD_NUMBER
+
+                    echo "Job Name: $jobName"
+                    echo "Build Number: $buildNumber"
+
+                    sh 'docker --version'
+                }
+            }
+        }
+
+        stage('Checkout Git Repository') {
+            steps {
+                script {
+                    def gitRepoUrl = 'https://github.com/vujanic79/golang-react-todo-app.git'
+
+                    checkout([$class: 'GitSCM',
+                        branches: [[name: '*/main']],
+                        userRemoteConfigs: [[url: gitRepoUrl]],
+                        extensions: [[$class: 'CleanBeforeCheckout'], [$class: 'CloneOption', noTags: false, shallow: true, depth: 1]]
+                    ])
+                }
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh 'chmod +x server/ci_cd/test/scripts/001_run_tests.sh && server/ci_cd/test/scripts/001_run_tests.sh'
+                junit 'server/report.xml'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Tests passed. Triggering ${DEPLOY_JOB}."
+            build job: "${DEPLOY_JOB}", propagate: false
+        }
+        failure {
+            echo "Tests failed. Skipping ${DEPLOY_JOB}."
+        }
+    }
+}

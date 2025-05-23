@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build Image') {
+            steps {
+                sh "chmod +x server/ci_cd/deploy/scripts/001_docker_build.sh"
+                sh "server/ci_cd/deploy/scripts/001_docker_build.sh ${env.BUILD_NUMBER}"
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    // Get the job name and build number
+                    def jobName = env.JOB_NAME
+                    def buildNumber = env.BUILD_NUMBER
+
+                    withCredentials([usernamePassword(credentialsId: '844bc746-c1af-475a-8a83-bfacc603449f', usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                        sh "chmod +x server/ci_cd/deploy/scripts/002_docker_push.sh"
+                        sh "server/ci_cd/deploy/scripts/002_docker_push.sh $buildNumber"
+                    }
+                    echo "Build Completed - Job Name: $jobName  --  Build Number: $buildNumber"
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying application using docker-compose...'
+                sh "docker-compose server/docker-compose pull"
+                sh "docker-compose -f server/docker-compose up -d"
+            }
+        }
+    }
+
+    post {
+        always {
+            sh 'docker logout'
+        }
+    }
+}
